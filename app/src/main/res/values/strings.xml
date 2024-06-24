@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">AppLearn</string>
+    <string name="tile_1">Tile 1</string>
+    <string name="tile_2">Tile 2</string>
+    <string name="tile_3">Tile 3</string>
+    <string name="tile_4">Tile 4</string>
+    <string name="enter_name">Введить назву</string>
+    <string name="create">Створити</string>
+    <string name="select">Оберить</string>
+    <string name="enter_word">Введіть слово</string>
+    <string name="enter_translation">Введіть переклад</string>
+    <string name="add">Додати</string>
+    <string name="englich">englisch</string>
+    <string name="deutsch">deutsch</string>
+    <string name="ukrainian">Ukrainian</string>
+    <string name="russian">russian</string>
+</resources>
