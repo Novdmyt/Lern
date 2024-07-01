@@ -10,8 +10,14 @@
     <string name="enter_word">Введіть слово</string>
     <string name="enter_translation">Введіть переклад</string>
     <string name="add">Додати</string>
-    <string name="englich">englisch</string>
-    <string name="deutsch">deutsch</string>
+    <string name="englich">Englisch</string>
+    <string name="deutsch">Deutsch</string>
     <string name="ukrainian">Ukrainian</string>
     <string name="russian">russian</string>
+    <string name="name">Переклад</string>
+    <string name="word_out_oder">Слова не попорядку</string>
+    <string name="help">Допомога</string>
+    <string name="check">Перевірити</string>
+    <string name="word">Слово</string>
+
 </resources>
