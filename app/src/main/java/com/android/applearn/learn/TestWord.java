@@ -1,5 +1,7 @@
 package com.android.applearn.learn;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -28,6 +30,7 @@ import com.android.applearn.setting.SettingApp;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public class TestWord extends Fragment {
 
@@ -45,7 +48,10 @@ public class TestWord extends Fragment {
     private int currentIndex = 0;
     private boolean randomOrder = false;
     private TextToSpeech textToSpeech;
+    private Locale selectedLanguage = Locale.ENGLISH; // Default language
 
+    private static final String PREFS_NAME = "app_preferences";
+    private static final String PREF_LANGUAGE = "selected_language";
 
     @Nullable
     @Override
@@ -63,14 +69,8 @@ public class TestWord extends Fragment {
         dbHelper = new DataBase(getActivity());
         db = dbHelper.getWritableDatabase();
 
-        textToSpeech = new TextToSpeech(getActivity(), status -> {
-            if (status == TextToSpeech.SUCCESS) {
-                textToSpeech.setLanguage(SettingApp.getSelectedLanguage());
-            } else {
-                Log.d("TestWord", "TextToSpeech initialization failed.");
-            }
-        });
-
+        loadSelectedLanguage();
+        setupTextToSpeech();
 
         loadTableNames();
         tableSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -96,7 +96,7 @@ public class TestWord extends Fragment {
                 if (randomOrder) {
                     Collections.shuffle(words);
                 } else {
-                    Collections.sort(words, (w1, w2) -> w1.getWord().compareTo(w2.getWord())); // Sort by word
+                    words.sort((w1, w2) -> w1.getWord().compareTo(w2.getWord())); // Sort by word
                 }
                 currentIndex = 0;
                 showNextWord();
@@ -104,7 +104,6 @@ public class TestWord extends Fragment {
         });
 
         speakerButton.setOnClickListener(v -> {
-            Log.d("TestWord", "Speaker button clicked.");
             speakCurrentWord();
         });
 
@@ -112,6 +111,38 @@ public class TestWord extends Fragment {
         helpButton.setOnClickListener(v -> showHelp());
 
         return view;
+    }
+
+    private void loadSelectedLanguage() {
+        SharedPreferences preferences = getActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        String language = preferences.getString(PREF_LANGUAGE, "English"); // Default to English
+        switch (language) {
+            case "English":
+                selectedLanguage = Locale.ENGLISH;
+                break;
+            case "German":
+                selectedLanguage = Locale.GERMAN;
+                break;
+            case "French":
+                selectedLanguage = Locale.FRENCH;
+                break;
+            case "Spanish":
+                selectedLanguage = new Locale("es", "ES"); // Spanish
+                break;
+            case "Italian":
+                selectedLanguage = Locale.ITALIAN;
+                break;
+        }
+    }
+
+    private void setupTextToSpeech() {
+        textToSpeech = new TextToSpeech(getActivity(), status -> {
+            if (status == TextToSpeech.SUCCESS) {
+                textToSpeech.setLanguage(selectedLanguage);
+            } else {
+                Log.d("TestWord", "TextToSpeech initialization failed.");
+            }
+        });
     }
 
     private void loadTableNames() {
@@ -174,7 +205,7 @@ public class TestWord extends Fragment {
         if (words != null && !words.isEmpty()) {
             String word = words.get(currentIndex).getWord();
             Log.d("TestWord", "Speaking word: " + word);
-            textToSpeech.setLanguage(SettingApp.getSelectedLanguage());
+            textToSpeech.setLanguage(selectedLanguage);
             textToSpeech.speak(word, TextToSpeech.QUEUE_FLUSH, null, null);
         } else {
             Log.d("TestWord", "Words list is empty or null.");

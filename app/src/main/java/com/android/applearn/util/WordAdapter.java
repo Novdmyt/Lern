@@ -18,14 +18,23 @@ import java.util.Locale;
 
 public class WordAdapter extends RecyclerView.Adapter<WordAdapter.WordViewHolder> {
 
-    private List<Word> words = new ArrayList<>();
-    private List<Word> filteredWords = new ArrayList<>();
+    private List<Word> words;
     private TextToSpeech tts;
-    private Locale language;
+    private Locale selectedLanguage;
 
-    public WordAdapter(TextToSpeech tts, Locale language) {
+    public WordAdapter(TextToSpeech tts, Locale selectedLanguage) {
+        this.words = new ArrayList<>();
         this.tts = tts;
-        this.language = language;
+        this.selectedLanguage = selectedLanguage;
+    }
+
+    public void setWords(List<Word> words) {
+        this.words = words;
+        notifyDataSetChanged();
+    }
+
+    public void filter(String query) {
+        // Implement filtering logic here
     }
 
     @NonNull
@@ -37,12 +46,13 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.WordViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull WordViewHolder holder, int position) {
-        Word word = filteredWords.get(position);
+        Word word = words.get(position);
         holder.wordTextView.setText(word.getWord());
         holder.translationTextView.setText(word.getTranslation());
 
         holder.itemView.setOnClickListener(v -> {
             if (tts != null) {
+                tts.setLanguage(selectedLanguage);
                 tts.speak(word.getWord(), TextToSpeech.QUEUE_FLUSH, null, null);
             }
         });
@@ -50,35 +60,15 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.WordViewHolder
 
     @Override
     public int getItemCount() {
-        return filteredWords.size();
-    }
-
-    public void setWords(List<Word> words) {
-        this.words = words;
-        this.filteredWords = new ArrayList<>(words);
-        notifyDataSetChanged();
-    }
-
-    public void filter(String query) {
-        filteredWords.clear();
-        if (query.isEmpty()) {
-            filteredWords.addAll(words);
-        } else {
-            query = query.toLowerCase();
-            for (Word word : words) {
-                if (word.getWord().toLowerCase().contains(query) || word.getTranslation().toLowerCase().contains(query)) {
-                    filteredWords.add(word);
-                }
-            }
-        }
-        notifyDataSetChanged();
+        return words.size();
     }
 
     static class WordViewHolder extends RecyclerView.ViewHolder {
+
         TextView wordTextView;
         TextView translationTextView;
 
-        WordViewHolder(View itemView) {
+        WordViewHolder(@NonNull View itemView) {
             super(itemView);
             wordTextView = itemView.findViewById(R.id.wordTextView);
             translationTextView = itemView.findViewById(R.id.translationTextView);
