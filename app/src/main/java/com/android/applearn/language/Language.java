@@ -11,7 +11,9 @@ import android.widget.Spinner;
 
 import com.android.applearn.R;
 
-public class Language {private final Context context;
+public class Language
+{
+    private final Context context;
 
     public Language(Context context) {
 

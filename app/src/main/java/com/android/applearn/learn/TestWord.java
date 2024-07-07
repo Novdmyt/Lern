@@ -4,6 +4,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ import androidx.fragment.app.Fragment;
 import com.android.applearn.R;
 import com.android.applearn.database.DataBase;
 import com.android.applearn.database.Word;
+import com.android.applearn.setting.SettingApp;
 
 import java.util.Collections;
 import java.util.List;
@@ -44,6 +46,7 @@ public class TestWord extends Fragment {
     private boolean randomOrder = false;
     private TextToSpeech textToSpeech;
 
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -59,6 +62,15 @@ public class TestWord extends Fragment {
 
         dbHelper = new DataBase(getActivity());
         db = dbHelper.getWritableDatabase();
+
+        textToSpeech = new TextToSpeech(getActivity(), status -> {
+            if (status == TextToSpeech.SUCCESS) {
+                textToSpeech.setLanguage(SettingApp.getSelectedLanguage());
+            } else {
+                Log.d("TestWord", "TextToSpeech initialization failed.");
+            }
+        });
+
 
         loadTableNames();
         tableSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -91,7 +103,10 @@ public class TestWord extends Fragment {
             }
         });
 
-      //  speakerButton.setOnClickListener(v -> speakWord());
+        speakerButton.setOnClickListener(v -> {
+            Log.d("TestWord", "Speaker button clicked.");
+            speakCurrentWord();
+        });
 
         checkButton.setOnClickListener(v -> checkTranslation());
         helpButton.setOnClickListener(v -> showHelp());
@@ -155,22 +170,14 @@ public class TestWord extends Fragment {
         }
     }
 
-   /* public void speakWord() {
+    private void speakCurrentWord() {
         if (words != null && !words.isEmpty()) {
             String word = words.get(currentIndex).getWord();
+            Log.d("TestWord", "Speaking word: " + word);
+            textToSpeech.setLanguage(SettingApp.getSelectedLanguage());
             textToSpeech.speak(word, TextToSpeech.QUEUE_FLUSH, null, null);
+        } else {
+            Log.d("TestWord", "Words list is empty or null.");
         }
-    }*/
-
-  /*  @Override
-    public void onDestroy() {
-        if (db != null && db.isOpen()) {
-            db.close();
-        }
-        if (textToSpeech != null) {
-            textToSpeech.stop();
-            textToSpeech.shutdown();
-        }
-        super.onDestroy();
-    }*/
+    }
 }
