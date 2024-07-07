@@ -65,14 +65,14 @@ public class DataBase extends SQLiteOpenHelper {
 
     public List<Word> getWordsFromTable(SQLiteDatabase db, String tableName) {
         List<Word> words = new ArrayList<>();
-        // Заключаем имя таблицы в квадратные скобки
-        String query = "SELECT Word, Translate FROM [" + tableName + "]";
+        String query = "SELECT ID, Word, Translate FROM [" + tableName + "]";
         Cursor cursor = db.rawQuery(query, null);
         if (cursor.moveToFirst()) {
             do {
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow("ID"));
                 String word = cursor.getString(cursor.getColumnIndexOrThrow("Word"));
                 String translation = cursor.getString(cursor.getColumnIndexOrThrow("Translate"));
-                words.add(new Word(word, translation));
+                words.add(new Word(id, word, translation));
             } while (cursor.moveToNext());
         }
         cursor.close();

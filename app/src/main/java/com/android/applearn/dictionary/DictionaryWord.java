@@ -23,20 +23,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.android.applearn.R;
 import com.android.applearn.database.DataBase;
 import com.android.applearn.database.Word;
-import com.android.applearn.setting.SettingApp;
 import com.android.applearn.util.WordAdapter;
 
 import java.util.List;
 import java.util.Locale;
 
 public class DictionaryWord extends Fragment {
-    private Spinner languageSpinner;
     private Spinner tableSpinner;
     private SearchView searchView;
     private RecyclerView recyclerView;
     private WordAdapter wordAdapter;
     private DataBase dbHelper;
-    private SQLiteDatabase db;
     private TextToSpeech tts;
     private Locale selectedLanguage = Locale.GERMAN;
 
@@ -87,8 +84,6 @@ public class DictionaryWord extends Fragment {
         });
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        wordAdapter = new WordAdapter(tts, selectedLanguage);
-        recyclerView.setAdapter(wordAdapter);
 
         return view;
     }
@@ -114,12 +109,14 @@ public class DictionaryWord extends Fragment {
     private void loadWordsFromTable(String tableName) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         List<Word> words = dbHelper.getWordsFromTable(db, tableName);
+        wordAdapter = new WordAdapter(getActivity(), tts, selectedLanguage, tableName);
         wordAdapter.setWords(words);
+        recyclerView.setAdapter(wordAdapter);
     }
 
     private void loadSelectedLanguage() {
         SharedPreferences preferences = getActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        String language = preferences.getString(PREF_LANGUAGE, "English"); // За замовчуванням English
+        String language = preferences.getString(PREF_LANGUAGE, "English");
         switch (language) {
             case "English":
                 selectedLanguage = Locale.ENGLISH;
@@ -131,7 +128,7 @@ public class DictionaryWord extends Fragment {
                 selectedLanguage = Locale.FRENCH;
                 break;
             case "Spanish":
-                selectedLanguage = new Locale("es", "ES"); // Іспанська
+                selectedLanguage = new Locale("es", "ES");
                 break;
             case "Italian":
                 selectedLanguage = Locale.ITALIAN;
